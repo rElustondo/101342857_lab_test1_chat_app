@@ -3,7 +3,6 @@ const app = express();
 const path = require('path');
 const User = require('../models/Users');
 
-// Serve static files from the public folder
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.json());
 
@@ -18,18 +17,11 @@ app.get('/login', (req, res) => {
 app.post('/signup', async (req, res) => {
   try {
     const userData = req.body;
-
-    // Create a new user instance
     const newUser = new User(userData);
-
-    // Save the user to the database
     const savedUser = await newUser.save();
-
-    // Send a success response
-    res.status(201).json({ message: 'User created successfully', user: savedUser });
+    res.status(201).json({ message: 'Congratulation, the user was created successfully! Please proceed to logging in.', user: savedUser });
   } catch (error) {
-    console.error('Error creating user:', error);
-    // Send an error response
+    console.error('There was an error creating user:', error);
     res.status(500).json({ message: 'An error occurred. Please try again later.' });
   }
 });
@@ -37,18 +29,14 @@ app.post('/signup', async (req, res) => {
 app.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    // Find user in the database by username and password
     const user = await User.findOne({ username, password });
     if (user) {
-      // Send a success response with user data
       res.status(200).json({ success: true, user });
     } else {
-      // Send a failure response if user not found
-      res.status(404).json({ success: false, message: 'User not found or incorrect credentials' });
+      res.status(404).json({ success: false, message: 'This user was not found or you entered incorrect password' });
     }
   } catch (error) {
-    console.error('Error logging in:', error);
-    // Send an error response
+    console.error('There was an error logging you in:', error);
     res.status(500).json({ success: false, message: 'An error occurred. Please try again later.' });
   }
 });

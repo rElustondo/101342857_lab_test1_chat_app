@@ -28,7 +28,6 @@
         userData[key] = value;
       }
       
-      // Send user data to server for login process
       fetch('/login', {
         method: 'POST',
         headers: {
@@ -46,7 +45,7 @@
         if (data.success) {
           alert('Login successful!');
           localStorage.setItem('chat-app-user',  JSON.stringify(data.user));
-          window.location.href = '/chat'; // Redirect to chat page after successful login
+          window.location.href = '/chat'; 
         } else {
           alert('Login failed. Please check your username or password.');
         }

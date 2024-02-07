@@ -3,22 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
   <title>Chat</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    #messages li {
+      padding: 5px 10px;
+      margin-bottom: 3px;
+      border-radius: 5px;
+      background-color: #f2f2f2;
+    }
+    #messages li:nth-child(odd) {
+      background-color: #e6e6e6;
+    }
+  </style>
 </head>
 <body>
-  <h1>Welcome to the Chat app</h1>
-  
-  <label for="room">Choose a room:</label>
-  <select id="room">
-    <option value="devops">DevOps</option>
-    <option value="cloud">Cloud Computing</option>
-    <option value="covid19">COVID-19</option>
-    <option value="sports">Sports</option>
-    <option value="nodejs">Node.js</option>
-  </select>
-  
-  <button id="joinRoomBtn">Join Room</button>
-
+    <div class="container mt-5">
+        <div class="row">
+          <div class="col">
+            <h1 class="mb-3">Welcome to the Chat app</h1>
+            <div id="chat">
+              <h2 id="room_title"></h2>
+              <ul id="messages"></ul>
+              <p id="typingIndicator"></p>
+              <form id="messageForm" style="display: none;">
+                <div class="input-group">
+                  <input id="messageInput" type="text" class="form-control" placeholder="Please enter message" autocomplete="off">
+                  <button type="submit" class="btn btn-primary">Send Message</button>
+                </div>
+              </form>
+              <button id="logoutBtn" class="btn btn-danger">Logout from Application</button>
+            </div>
+          </div>
+          <div class="col">
+            <h2>Choose a Room</h2>
+            <div class="input-group mb-3">
+              <select id="room" class="form-select">
+                <option value="devops">DevOps</option>
+                <option value="cloud">Cloud Computing</option>
+                <option value="covid19">COVID-19</option>
+                <option value="sports">Sports</option>
+                <option value="nodejs">Node.js</option>
+              </select>
+              <button id="joinRoomBtn" class="btn btn-success">Join Room</button>
+              <button id="leaveRoomBtn" class="btn btn-danger" style="display: none;">Leave Room</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const userData = JSON.parse(localStorage.getItem('chat-app-user'));
@@ -27,15 +66,82 @@
       window.location.href = '/login';
     }
 
+    const input = document.getElementById('messageInput');
+
+    input.addEventListener('keypress', () => {
+        socket.emit('typing', { username: userData.username, typing:true });
+    });
+
     const socket = io();
+    socket.on('userTyping', ({ username, typing }) => {
+        const typingIndicator = document.getElementById('typingIndicator');
+        typingIndicator.textContent = typing? `${username} currently typing...`: "";
+    });
+    socket.on('messages', (messages) => {
+    const messagesDocElement = document.getElementById('messages');
+    messagesDocElement.innerHTML = '';
+    messages.forEach(({ username, message }) => {
+        const li = document.createElement('li');
+        li.textContent = `${username}: ${message}`;
+        messagesDocElement.appendChild(li);
+    });
+    });
+    
+    socket.on('message', ({ username, message }) => {
+      const messages = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.textContent = `${username}: ${message}`;
+      messages.appendChild(li);
+    });
+
+    document.getElementById('messageForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const userData = JSON.parse(localStorage.getItem('chat-app-user'));
+      const room = localStorage.getItem("currentRoom");
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      console.log("test1",{ username: userData.username, message, room })
+      
+      if (message) {
+        socket.emit('sendMessage', { username: userData.username, message, room });
+        input.value = '';
+      }
+    });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      localStorage.removeItem('chat-app-user'); 
+      window.location.href = '/login'; 
+    });
+
 
     document.getElementById('joinRoomBtn').addEventListener('click', () => {
       const room = document.getElementById('room').value;
-
       socket.emit('joinRoom', { room });
-
-      window.location.href = `/room/${room}`;
+      localStorage.setItem("currentRoom",room)
+      document.getElementById("room_title").innerHTML = room
+      const messageForm = document.getElementById('messageForm');
+      messageForm.style.display = 'block';
+      toggleRoomButtons();
     });
+    document.getElementById('leaveRoomBtn').addEventListener('click', () => {
+      socket.emit('leaveRoom', { room: localStorage.getItem("currentRoom") });
+      localStorage.setItem("currentRoom","")
+      document.getElementById("room_title").innerHTML = ""
+      const messageForm = document.getElementById('messageForm');
+      messageForm.style.display = 'none';
+      toggleRoomButtons();
+    });
+
+    function toggleRoomButtons() {
+      const joinBtn = document.getElementById('joinRoomBtn');
+      const leaveBtn = document.getElementById('leaveRoomBtn');
+      if (localStorage.getItem("currentRoom") !== "") {
+        joinBtn.style.display = 'none';
+        leaveBtn.style.display = 'block';
+      } else {
+        joinBtn.style.display = 'block';
+        leaveBtn.style.display = 'none';
+      }
+    }
   </script>
 </body>
 </html>

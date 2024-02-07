@@ -34,9 +34,6 @@
         userData[key] = value;
       }
       
-      // You can perform additional validation here
-      
-      // Send user data to server for signup process
       fetch('/signup', {
         method: 'POST',
         headers: {
@@ -47,7 +44,7 @@
       .then(response => {
         if (response.ok) {
           alert('Sign up successful!');
-          window.location.href = '/login'; // Redirect to login page after successful signup
+          window.location.href = '/login'; 
         } else {
           alert('Sign up failed. Please try again.');
         }
@@ -57,7 +54,6 @@
         alert('An error occurred. Please try again later.');
       });
 
-      
     });
   </script>
 </body>
