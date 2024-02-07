@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+  <style>
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    #messages li {
+      padding: 5px 10px;
+      margin-bottom: 3px;
+      border-radius: 5px;
+      background-color: #f2f2f2;
+    }
+    #messages li:nth-child(odd) {
+      background-color: #e6e6e6;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to the Chat app</h1>
+  
+  <div id="chat">
+    <ul id="messages"></ul>
+    <form id="messageForm">
+      <input id="messageInput" autocomplete="off" /><button>Send</button>
+    </form>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const userData = JSON.parse(localStorage.getItem('chat-app-user'));
+
+    if (!userData) {
+      window.location.href = '/login';
+    }
+
+    const socket = io();
+
+    // Display incoming messages
+    socket.on('message', ({ username, message }) => {
+      const messages = document.getElementById('messages');
+      const li = document.createElement('li');
+      li.textContent = `${username}: ${message}`;
+      messages.appendChild(li);
+    });
+
+    // Handle sending messages
+    document.getElementById('messageForm').addEventListener('submit', (event) => {
+      event.preventDefault();
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (message) {
+        socket.emit('sendMessage', message);
+        input.value = '';
+      }
+    });
+  </script>
+</body>
+</html>

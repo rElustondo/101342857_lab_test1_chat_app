@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat</title>
+</head>
+<body>
+  <h1>Welcome to the Chat app</h1>
+  
+  <label for="room">Choose a room:</label>
+  <select id="room">
+    <option value="devops">DevOps</option>
+    <option value="cloud">Cloud Computing</option>
+    <option value="covid19">COVID-19</option>
+    <option value="sports">Sports</option>
+    <option value="nodejs">Node.js</option>
+  </select>
+  
+  <button id="joinRoomBtn">Join Room</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const userData = JSON.parse(localStorage.getItem('chat-app-user'));
+
+    if (!userData) {
+      window.location.href = '/login';
+    }
+
+    const socket = io();
+
+    document.getElementById('joinRoomBtn').addEventListener('click', () => {
+      const room = document.getElementById('room').value;
+
+      socket.emit('joinRoom', { room });
+
+      window.location.href = `/room/${room}`;
+    });
+  </script>
+</body>
+</html>
