@@ -60,3 +60,5 @@ mongoose.connect(connectionString, {
         console.log('A user disconnected');
     });
   });
+
+  module.exports = app
