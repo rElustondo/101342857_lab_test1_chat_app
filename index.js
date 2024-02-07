@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const userRouter = require('./routes/UserRoutes');
 const chatRouter = require('./routes/ChatRoutes');
 const Message = require('./models/Message')
+const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(userRouter);
 app.use(chatRouter)
@@ -17,7 +18,7 @@ mongoose.connect(connectionString, {
   }).catch(err => {
     console.log('Error Mongodb connection')
   });
-  const server = app.listen(3000, () => { console.log('Server is running...')});
+  const server = app.listen(PORT, () => { console.log('Server is running...')});
   const io = require('socket.io')(server);
 
   io.on('connection', (socket) => {
