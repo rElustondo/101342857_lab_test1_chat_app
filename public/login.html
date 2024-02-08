@@ -45,7 +45,7 @@
         if (data.success) {
           alert('Login successful!');
           localStorage.setItem('chat-app-user',  JSON.stringify(data.user));
-          window.location.href = '/chat'; 
+          window.location.href = '/'; 
         } else {
           alert('Login failed. Please check your username or password.');
         }

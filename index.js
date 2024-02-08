@@ -43,7 +43,6 @@ mongoose.connect(connectionString, {
 
     socket.on('sendMessage', async ({username,message, room}) => {
 
-        console.log("details to be saved",{ username, message, room}  )
         try {
             const newMessage = new Message({ username, message, room });
             await newMessage.save();

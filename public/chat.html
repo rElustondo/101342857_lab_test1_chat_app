@@ -25,12 +25,17 @@
 </head>
 <body>
     <div class="container mt-5">
-        <div class="row">
-          <div class="col">
-            <h1 class="mb-3">Welcome to the Chat app</h1>
-            <div id="chat">
-              <h2 id="room_title"></h2>
-              <ul id="messages"></ul>
+      <h2>Chat app </h2>
+        <div class="col">
+          <div class="row">
+            
+              
+            
+            <div class="col" id="chat">
+              <span>Room name:</span>
+              <span id="room_title"></span>
+              <ul id="messages">
+              </ul>
               <p id="typingIndicator"></p>
               <form id="messageForm" style="display: none;">
                 <div class="input-group">
@@ -80,9 +85,15 @@
     socket.on('messages', (messages) => {
     const messagesDocElement = document.getElementById('messages');
     messagesDocElement.innerHTML = '';
-    messages.forEach(({ username, message }) => {
+    messages.forEach(({ username, message,createdAt }) => {
         const li = document.createElement('li');
-        li.textContent = `${username}: ${message}`;
+        li.innerHTML = `
+        <div class="top-row">
+            <span class="username"><small>${username}</small></span>
+            <span class="timestamp"><small>${new Date(createdAt).toLocaleTimeString()}</small></span>
+        </div>
+        <div class="bottom-row"><b>${message}</b></div>
+    `;
         messagesDocElement.appendChild(li);
     });
     });
