@@ -25,6 +25,7 @@
 </head>
 <body>
     <div class="container mt-5">
+      <button id="logoutBtn" class="btn btn-danger">Logout from Application</button>
       <h2>Chat app </h2>
         <div class="col">
           <div class="row">
@@ -43,7 +44,6 @@
                   <button type="submit" class="btn btn-primary">Send Message</button>
                 </div>
               </form>
-              <button id="logoutBtn" class="btn btn-danger">Logout from Application</button>
             </div>
           </div>
           <div class="col">
@@ -70,6 +70,10 @@
     if (!userData) {
       window.location.href = '/login';
     }
+
+    const messagesDocElement = document.getElementById('messages')
+    messagesDocElement.style.maxHeight = "300px"; // Set a fixed height for the container
+    messagesDocElement.style.overflowY = "auto";
 
     const input = document.getElementById('messageInput');
 
